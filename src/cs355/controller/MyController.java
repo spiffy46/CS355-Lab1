@@ -12,7 +12,7 @@ import cs355.model.drawing.*;
 
 public class MyController implements CS355Controller{
 	
-	MyModel model = new MyModel();
+	MyModel model;
 	public Color col;
 	public String shape = "";
 	public Point2D.Double p1;
@@ -24,7 +24,6 @@ public class MyController implements CS355Controller{
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
 		p1 = new Point2D.Double(e.getPoint().getX(),e.getPoint().getY());
 		String t = "p1: " + p1.getX() + "," + p1.getY();
 		GUIFunctions.printf(t);
@@ -32,7 +31,6 @@ public class MyController implements CS355Controller{
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
 		p2 = new Point2D.Double(e.getPoint().getX(),e.getPoint().getY());
 		String t = "p2: " + p2.getX() + "," + p2.getY();
 		GUIFunctions.printf(t);
@@ -40,6 +38,28 @@ public class MyController implements CS355Controller{
 		if (shape == "line"){
 			Line s = new Line(col,p1,p2);
 			model.addShape(s);
+		}else if(shape == "square"){
+			//TODO finish
+		}else if(shape == "rectangle"){
+			Point2D.Double upLeft = new Point2D.Double();
+			upLeft.setLocation(Math.min(p1.getX(), p2.getX()), Math.min(p1.getY(),p2.getY()));
+			Double width = Math.abs(p1.getX() - p2.getX());
+			Double height = Math.abs(p1.getY() - p2.getY());
+			Rectangle s = new Rectangle(col,upLeft,width,height);
+			model.addShape(s);
+		}else if(shape == "circle"){
+			//TODO finish
+		}else if(shape == "ellipse"){
+			Point2D.Double center = new Point2D.Double();
+			center.setLocation((p1.getX() + p2.getX())/2, (p1.getY() + p2.getY())/2);
+			Double width = Math.abs(p1.getX() - p2.getX());
+			Double height = Math.abs(p1.getY() - p2.getY());
+			Ellipse el = new Ellipse(col,center,width,height);
+			model.addShape(el);
+		}else if(shape == "triangle"){
+			//TODO finish
+		}else{
+			
 		}
 	}
 
@@ -254,6 +274,10 @@ public class MyController implements CS355Controller{
 	public void doSendtoBack() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public void setModel(MyModel model2) {
+		model = model2;
 	}
 
 }

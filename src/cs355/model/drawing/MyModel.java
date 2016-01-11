@@ -1,75 +1,85 @@
 package cs355.model.drawing;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import cs355.GUIFunctions;
 
 public class MyModel extends CS355Drawing{
 
-	ArrayList<Shape> shapeList = new ArrayList<Shape>();
+	List<Shape> shapeList = new ArrayList<Shape>();
 	
 	@Override
 	public Shape getShape(int index) {
-		// TODO Auto-generated method stub
-		return null;
+		return shapeList.get(index);
 	}
 
 	@Override
 	public int addShape(Shape s) {
-		// TODO Auto-generated method stub
 		shapeList.add(s);
-		String t = s.getClass().getName();
-		GUIFunctions.printf(t);
+		setChanged();
+		notifyObservers();
 		return (shapeList.size()-1);
 	}
 
 	@Override
 	public void deleteShape(int index) {
-		// TODO Auto-generated method stub
-		
+		shapeList.remove(index);
 	}
 
 	@Override
 	public void moveToFront(int index) {
-		// TODO Auto-generated method stub
-		
+		// TODO Test this method!!
+		Shape s = shapeList.get(index);
+		shapeList.remove(index);
+		ArrayList<Shape> newList = new ArrayList<Shape>();
+		newList.add(s);
+		newList.addAll(shapeList);
 	}
 
 	@Override
 	public void movetoBack(int index) {
-		// TODO Auto-generated method stub
-		
+		Shape s = shapeList.get(index);
+		shapeList.remove(index);
+		shapeList.add(s);
 	}
 
 	@Override
 	public void moveForward(int index) {
-		// TODO Auto-generated method stub
-		
+		if(index != 0){
+			Shape s = shapeList.get(index);
+			Shape s1 = shapeList.get(index-1);
+			shapeList.set(index, s1);
+			shapeList.set(index-1, s);
+		}
 	}
 
 	@Override
 	public void moveBackward(int index) {
-		// TODO Auto-generated method stub
-		
+		if(index != shapeList.size()-1){
+			Shape s = shapeList.get(index);
+			Shape s1 = shapeList.get(index+1);
+			shapeList.set(index, s1);
+			shapeList.set(index+1, s);
+		}
 	}
 
 	@Override
 	public List<Shape> getShapes() {
-		// TODO Auto-generated method stub
-		return null;
+		return shapeList;
 	}
 
 	@Override
 	public List<Shape> getShapesReversed() {
-		// TODO Auto-generated method stub
-		return null;
+		List<Shape> r = shapeList;
+		Collections.reverse(r);
+		return r;
 	}
 
 	@Override
 	public void setShapes(List<Shape> shapes) {
-		// TODO Auto-generated method stub
-		
+		shapeList = shapes;
 	}
 
 }
