@@ -6,20 +6,40 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.util.Iterator;
+import java.util.Observable;
 
 import cs355.GUIFunctions;
 import cs355.model.drawing.*;
 
-public class MyController implements CS355Controller{
+public class MyController extends Observable implements CS355Controller{
 	
 	MyModel model;
+	Shape currentShape;
 	public Color col;
 	public String shape = "";
 	public Point2D.Double p1;
 	public Point2D.Double p2;
-	
+	public int triangleCount = 0;
+	public Point2D.Double t1;
+	public Point2D.Double t2;
+	public Point2D.Double t3;
+
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		if (shape == "triangle"){
+			if (triangleCount == 0){
+				t1 = new Point2D.Double(e.getPoint().getX(),e.getPoint().getY());
+				triangleCount++;
+			}else if(triangleCount ==1){
+				t2 = new Point2D.Double(e.getPoint().getX(),e.getPoint().getY());
+				triangleCount++;
+			}else{
+				t3 = new Point2D.Double(e.getPoint().getX(),e.getPoint().getY());
+				triangleCount = 0;
+				Shape t = new Triangle(col,t1,t2,t3);
+				model.addShape(t);
+			}
+		}
 	}
 
 	@Override
@@ -31,61 +51,89 @@ public class MyController implements CS355Controller{
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
+		if(currentShape != null){
+			model.addShape(currentShape);
+			currentShape = null;
+		}
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {		
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent e) {
 		p2 = new Point2D.Double(e.getPoint().getX(),e.getPoint().getY());
 		String t = "p2: " + p2.getX() + "," + p2.getY();
 		GUIFunctions.printf(t);
 		
 		if (shape == "line"){
 			Line s = new Line(col,p1,p2);
-			model.addShape(s);
+			currentShape = s;
 		}else if(shape == "square"){
-			//TODO finish
+			double size = Math.min((Math.abs(p1.getX()-p2.getX())),(Math.abs(p1.getY()-p2.getY())));
+			Point2D.Double upLeft = new Point2D.Double();
+			
+			if(p1.getX() <= p2.getX() && p1.getY() <= p2.getY()){
+				upLeft.setLocation(p1.getX(), p1.getY());
+			}else if(p1.getX() <= p2.getX() && p1.getY() > p2.getY()){
+				upLeft.setLocation(p1.getX(), p1.getY()-size);
+			}else if(p1.getX() > p2.getX() && p1.getY() <= p2.getY()){
+				upLeft.setLocation(p1.getX()-size, p1.getY());
+			}else{
+				upLeft.setLocation(p1.getX()-size, p1.getY()-size);
+			}
+			Square s = new Square(col,upLeft,size);
+			currentShape = s;
 		}else if(shape == "rectangle"){
 			Point2D.Double upLeft = new Point2D.Double();
 			upLeft.setLocation(Math.min(p1.getX(), p2.getX()), Math.min(p1.getY(),p2.getY()));
 			Double width = Math.abs(p1.getX() - p2.getX());
 			Double height = Math.abs(p1.getY() - p2.getY());
 			Rectangle s = new Rectangle(col,upLeft,width,height);
-			model.addShape(s);
+			currentShape = s;
 		}else if(shape == "circle"){
-			//TODO finish
+			double size = Math.min((Math.abs(p1.getX()-p2.getX())),(Math.abs(p1.getY()-p2.getY())));
+			double radius = size/2;
+			Point2D.Double upLeft = new Point2D.Double();
+			
+			if(p1.getX() <= p2.getX() && p1.getY() <= p2.getY()){
+				upLeft.setLocation(p1.getX(), p1.getY());
+			}else if(p1.getX() <= p2.getX() && p1.getY() > p2.getY()){
+				upLeft.setLocation(p1.getX(), p1.getY()-size);
+			}else if(p1.getX() > p2.getX() && p1.getY() <= p2.getY()){
+				upLeft.setLocation(p1.getX()-size, p1.getY());
+			}else{
+				upLeft.setLocation(p1.getX()-size, p1.getY()-size);
+			}
+			Point2D.Double center = new Point2D.Double();
+			center.setLocation(upLeft.getX()+radius, upLeft.getY()+radius);
+			Circle c = new Circle(col,center,radius);
+			currentShape = c;
 		}else if(shape == "ellipse"){
 			Point2D.Double center = new Point2D.Double();
 			center.setLocation((p1.getX() + p2.getX())/2, (p1.getY() + p2.getY())/2);
 			Double width = Math.abs(p1.getX() - p2.getX());
 			Double height = Math.abs(p1.getY() - p2.getY());
 			Ellipse el = new Ellipse(col,center,width,height);
-			model.addShape(el);
+			currentShape = el;
 		}else if(shape == "triangle"){
 			//TODO finish
 		}else{
 			
 		}
+		setChanged();
+		notifyObservers();
 	}
 
 	@Override
-	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
+	public void mouseMoved(MouseEvent e) {		
 	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseDragged(MouseEvent e) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void mouseMoved(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 	@Override
 	public void colorButtonHit(Color c) {
 		col = c;
@@ -109,7 +157,7 @@ public class MyController implements CS355Controller{
 
 	@Override
 	public void circleButtonHit() {
-		shape = "cirle";
+		shape = "circle";
 	}
 
 	@Override
@@ -119,7 +167,6 @@ public class MyController implements CS355Controller{
 
 	@Override
 	public void triangleButtonHit() {
-		// TODO Auto-generated method stub
 		shape = "triangle";
 	}
 
@@ -193,14 +240,13 @@ public class MyController implements CS355Controller{
 	//Lab1
 	@Override
 	public void saveDrawing(File file) {
-		// TODO Auto-generated method stub
-		
+		model.save(file);
 	}
 
 	@Override
 	public void openDrawing(File file) {
-		// TODO Auto-generated method stub
-		
+		// TODO Test
+		model.open(file);
 	}
 
 	//Lab2
@@ -280,4 +326,7 @@ public class MyController implements CS355Controller{
 		model = model2;
 	}
 
+	public Shape getShape() {
+		return currentShape;
+	}
 }

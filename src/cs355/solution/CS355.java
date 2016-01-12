@@ -23,6 +23,7 @@ public class CS355 {
 		controller.setModel(model);
 		MyView view = new MyView();
 		view.setModel(model);
+		view.setController(controller);
 		// Fill in the parameters below with your controller and view.
 		GUIFunctions.createCS355Frame(controller, view);
 

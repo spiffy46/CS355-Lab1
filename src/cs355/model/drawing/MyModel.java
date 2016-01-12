@@ -80,6 +80,8 @@ public class MyModel extends CS355Drawing{
 	@Override
 	public void setShapes(List<Shape> shapes) {
 		shapeList = shapes;
+		setChanged();
+		notifyObservers();
 	}
 
 }
