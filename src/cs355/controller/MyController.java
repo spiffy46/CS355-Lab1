@@ -6,15 +6,16 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.util.Iterator;
-import java.util.Observable;
+import java.util.List;
 
 import cs355.GUIFunctions;
 import cs355.model.drawing.*;
 
-public class MyController extends Observable implements CS355Controller{
+public class MyController implements CS355Controller{
 	
 	MyModel model;
 	Shape currentShape;
+	List<Shape> shapeList;
 	public Color col;
 	public String shape = "";
 	public Point2D.Double p1;
@@ -25,8 +26,22 @@ public class MyController extends Observable implements CS355Controller{
 	public Point2D.Double t3;
 
 	@Override
-	public void mouseClicked(MouseEvent e) {
-		if (shape == "triangle"){
+	public void mouseClicked(MouseEvent e) {}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		p1 = new Point2D.Double(e.getPoint().getX(),e.getPoint().getY());
+		if (shape == "line"){
+			currentShape = new Line(col,p1,p1);
+		}else if(shape == "square"){
+			currentShape = new Square(col,p1,0);
+		}else if(shape == "rectangle"){
+			currentShape = new Rectangle(col,p1,0,0);
+		}else if(shape == "circle"){
+			currentShape = new Circle(col,p1,0);
+		}else if(shape == "ellipse"){
+			currentShape = new Ellipse(col,p1,0,0);
+		}else if (shape == "triangle"){
 			if (triangleCount == 0){
 				t1 = new Point2D.Double(e.getPoint().getX(),e.getPoint().getY());
 				triangleCount++;
@@ -38,15 +53,12 @@ public class MyController extends Observable implements CS355Controller{
 				triangleCount = 0;
 				Shape t = new Triangle(col,t1,t2,t3);
 				model.addShape(t);
-			}
+			}	
+			return;
+		}else{
+			return;
 		}
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-		p1 = new Point2D.Double(e.getPoint().getX(),e.getPoint().getY());
-		String t = "p1: " + p1.getX() + "," + p1.getY();
-		GUIFunctions.printf(t);
+		model.addShape(currentShape);
 	}
 
 	@Override
@@ -72,8 +84,11 @@ public class MyController extends Observable implements CS355Controller{
 		GUIFunctions.printf(t);
 		
 		if (shape == "line"){
-			Line s = new Line(col,p1,p2);
-			currentShape = s;
+			currentShape = model.getShape(model.getSize()-1);
+			Line l = (Line)currentShape;
+			l.setEnd(p2);
+			model.deleteShape(model.getSize()-1);
+			model.addShape(l);
 		}else if(shape == "square"){
 			double size = Math.min((Math.abs(p1.getX()-p2.getX())),(Math.abs(p1.getY()-p2.getY())));
 			Point2D.Double upLeft = new Point2D.Double();
@@ -87,15 +102,24 @@ public class MyController extends Observable implements CS355Controller{
 			}else{
 				upLeft.setLocation(p1.getX()-size, p1.getY()-size);
 			}
-			Square s = new Square(col,upLeft,size);
-			currentShape = s;
+			currentShape = model.getShape(model.getSize()-1);
+			Square s = (Square)currentShape;
+			s.setUpperLeft(upLeft);
+			s.setSize(size);
+			model.deleteShape(model.getSize()-1);
+			model.addShape(s);
 		}else if(shape == "rectangle"){
 			Point2D.Double upLeft = new Point2D.Double();
 			upLeft.setLocation(Math.min(p1.getX(), p2.getX()), Math.min(p1.getY(),p2.getY()));
 			Double width = Math.abs(p1.getX() - p2.getX());
 			Double height = Math.abs(p1.getY() - p2.getY());
-			Rectangle s = new Rectangle(col,upLeft,width,height);
-			currentShape = s;
+			currentShape = model.getShape(model.getSize()-1);
+			Rectangle r = (Rectangle)currentShape;
+			r.setHeight(height);
+			r.setWidth(width);
+			r.setUpperLeft(upLeft);
+			model.deleteShape(model.getSize()-1);
+			model.addShape(r);
 		}else if(shape == "circle"){
 			double size = Math.min((Math.abs(p1.getX()-p2.getX())),(Math.abs(p1.getY()-p2.getY())));
 			double radius = size/2;
@@ -112,22 +136,27 @@ public class MyController extends Observable implements CS355Controller{
 			}
 			Point2D.Double center = new Point2D.Double();
 			center.setLocation(upLeft.getX()+radius, upLeft.getY()+radius);
-			Circle c = new Circle(col,center,radius);
-			currentShape = c;
+			currentShape = model.getShape(model.getSize()-1);
+			Circle c = (Circle)currentShape;
+			c.setCenter(center);
+			c.setRadius(radius);
+			model.deleteShape(model.getSize()-1);
+			model.addShape(c);
 		}else if(shape == "ellipse"){
 			Point2D.Double center = new Point2D.Double();
 			center.setLocation((p1.getX() + p2.getX())/2, (p1.getY() + p2.getY())/2);
 			Double width = Math.abs(p1.getX() - p2.getX());
 			Double height = Math.abs(p1.getY() - p2.getY());
-			Ellipse el = new Ellipse(col,center,width,height);
-			currentShape = el;
-		}else if(shape == "triangle"){
-			//TODO finish
+			currentShape = model.getShape(model.getSize()-1);
+			Ellipse el = (Ellipse)currentShape;
+			el.setCenter(center);
+			el.setHeight(height);
+			el.setWidth(width);
+			model.deleteShape(model.getSize()-1);
+			model.addShape(el);
 		}else{
 			
 		}
-		setChanged();
-		notifyObservers();
 	}
 
 	@Override
@@ -143,31 +172,37 @@ public class MyController extends Observable implements CS355Controller{
 	@Override
 	public void lineButtonHit() {
 		shape = "line";
+		triangleCount = 0;
 	}
 
 	@Override
 	public void squareButtonHit() {
 		shape = "square";
+		triangleCount = 0;
 	}
 
 	@Override
 	public void rectangleButtonHit() {
 		shape = "rectangle";
+		triangleCount = 0;
 	}
 
 	@Override
 	public void circleButtonHit() {
 		shape = "circle";
+		triangleCount = 0;
 	}
 
 	@Override
 	public void ellipseButtonHit() {
 		shape = "ellipse";
+		triangleCount = 0;
 	}
 
 	@Override
 	public void triangleButtonHit() {
 		shape = "triangle";
+		triangleCount = 0;
 	}
 
 	//Lab 2
@@ -245,7 +280,6 @@ public class MyController extends Observable implements CS355Controller{
 
 	@Override
 	public void openDrawing(File file) {
-		// TODO Test
 		model.open(file);
 	}
 

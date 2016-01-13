@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import cs355.GUIFunctions;
-
 public class MyModel extends CS355Drawing{
 
 	List<Shape> shapeList = new ArrayList<Shape>();
@@ -30,7 +28,6 @@ public class MyModel extends CS355Drawing{
 
 	@Override
 	public void moveToFront(int index) {
-		// TODO Test this method!!
 		Shape s = shapeList.get(index);
 		shapeList.remove(index);
 		ArrayList<Shape> newList = new ArrayList<Shape>();
@@ -82,6 +79,10 @@ public class MyModel extends CS355Drawing{
 		shapeList = shapes;
 		setChanged();
 		notifyObservers();
+	}
+	
+	public int getSize() {
+		return shapeList.size();
 	}
 
 }
