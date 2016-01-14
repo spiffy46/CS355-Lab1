@@ -16,7 +16,7 @@ public class MyController implements CS355Controller{
 	MyModel model;
 	Shape currentShape;
 	List<Shape> shapeList;
-	public Color col;
+	public Color col = Color.white;
 	public String shape = "";
 	public Point2D.Double p1;
 	public Point2D.Double p2;
@@ -62,26 +62,17 @@ public class MyController implements CS355Controller{
 	}
 
 	@Override
-	public void mouseReleased(MouseEvent e) {
-		if(currentShape != null){
-			model.addShape(currentShape);
-			currentShape = null;
-		}
-	}
+	public void mouseReleased(MouseEvent e) {}
 
 	@Override
-	public void mouseEntered(MouseEvent e) {		
-	}
+	public void mouseEntered(MouseEvent e) {}
 
 	@Override
-	public void mouseExited(MouseEvent e) {		
-	}
+	public void mouseExited(MouseEvent e) {}
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		p2 = new Point2D.Double(e.getPoint().getX(),e.getPoint().getY());
-		String t = "p2: " + p2.getX() + "," + p2.getY();
-		GUIFunctions.printf(t);
 		
 		if (shape == "line"){
 			currentShape = model.getShape(model.getSize()-1);
@@ -160,8 +151,7 @@ public class MyController implements CS355Controller{
 	}
 
 	@Override
-	public void mouseMoved(MouseEvent e) {		
-	}
+	public void mouseMoved(MouseEvent e) {}
 	
 	@Override
 	public void colorButtonHit(Color c) {
